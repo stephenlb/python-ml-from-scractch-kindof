@@ -1,12 +1,12 @@
-## Suryansh - Use Python for
-## Bioinformatics and analytics and AI
-
 ## TODAY WE ARE WRITING ML FRAMEWORK
-## FROM SCRATCH 
+## FROM SCRATCH PART 2: BACKPROPEGATION
 import numpy as np
 
 EPOCHS=1
 LEARN_RATE=0.01
+
+## Artificail Nerual Network
+## ANN
 
 ## XOR Operator
 ## features (input) (training)
@@ -14,6 +14,8 @@ x = np.array([[0,0],[0,1],[1,0],[1,1]])
 
 ## labels (output) expected answer
 y = np.array([[0  ],[1  ],[1  ],[0  ]])
+
+## input data MUST be between -1 and +1
 
 ##tanh     = -1 to +1
 ##sigmoid   = 0 to 1
@@ -24,7 +26,7 @@ class Layer():
         input=4,
         output=4,
         activation=np.tanh,
-        derivitive=lambda x: 1 - np.tanh(x)**2,
+        derivitive=lambda x: 1 - np.tanh(x) ** 2,
     ):
         self.bias = np.random.rand(output)
         self.weights = np.random.rand(
@@ -35,20 +37,16 @@ class Layer():
         self.derivitive = derivitive
 
     def forward(self, inputs):
-        out = inputs @ self.weights
         self.input = inputs
-        self.output = out
-        return self.activation(out)
+        return self.activation(inputs @ self.weights + self.bias)
 
+    def backward(self, gradient):
+        self.gradient = gradient
+        return np.dot(gradient, self.weights.T) * self.derivitive(self.input) 
 
-    def backward(self, loss):
-        #d_predicted_output = error * sigmoid_derivative(predicted_output)
-        self.gradient       = loss * self.derivitive(self.output)
-        #return back
-
-def optimze(layer, back):
-    self.weights -= delta * LEARN_RATE
-    pass
+    def optimze():
+        self.weights += LEARN_RATE * self.input.T @ self.gradient
+        self.bias += LEARN_RATE * np.sum(self.gradient, axis=0, keepdims=True)
 
 ## Model
 a = Layer(input=2, output=4)
@@ -60,20 +58,35 @@ for i in range(EPOCHS):
     print(f"Epoch: {i}")
 
     ## forward
-    a_out = a.forward(x)
-    b_out = b.forward(a_out)
-    c_out = c.forward(b_out)
-    print(c_out)
+    out = a.forward(x)
+    out = b.forward(out)
+    out = c.forward(out)
+    print(out) ## AI's "answer"
 
-    ## delta
-    delta = c_out - y
+    ## delta (error)
+    delta = out - y
     print(delta)
 
-    ## loss
+    ## loss for monitoring / cost
     loss = np.mean(np.square(delta))
+    ## good loss = below 1.0 approaching 0.1
+    ## bad loss = above 1.0 incrase beyond 1
+    print(loss)
 
-    c.backward(loss)
-    print(c.gradient)
+    ## First gradient
+    gradient = delta * c.derivitive(out)
+    print(gradient)
+
+    ## Backpropegation
+    gradient = c.backward(gradient)
+    print(gradient)
+
+    gradient = b.backward(gradient)
+    print(gradient)
+
+    gradient = a.backward(gradient)
+    print(gradient)
+
     #b_back = b.backward(delta)
     #a_back = a.backward(delta)
 
