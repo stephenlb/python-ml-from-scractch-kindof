@@ -28,6 +28,11 @@ class Layer():
         activation=np.tanh,
         derivitive=lambda x: 1 - np.tanh(x) ** 2,
     ):
+        ## TODO
+        ## TODO
+        ## TODO simplify
+        ## TODO
+        ## TODO
         self.bias = np.random.rand(1, output)
         self.weights = np.random.rand(
             input,
@@ -41,12 +46,22 @@ class Layer():
         return self.activation(inputs @ self.weights + self.bias)
 
     def backward(self, gradient):
+        ## TODO
+        ## TODO
+        ## TODO simplify
+        ## TODO
+        ## TODO
         self.gradient = gradient
         self.optimize()
         return np.dot(gradient, self.weights.T) * self.derivitive(self.input) 
 
     def optimize(self):
         self.weights -= LEARN_RATE * self.input.T @ self.gradient
+        ## TODO 
+        ## TODO 
+        ## TODO simplify
+        ## TODO 
+        ## TODO 
         self.bias -= LEARN_RATE * np.sum(self.gradient, axis=0, keepdims=True)
 
 ## Model
@@ -56,7 +71,7 @@ c = Layer(input=4, output=1)
 
 ## Training (FIT) .train() .fit()
 for i in range(EPOCHS):
-    print(f"Epoch: {i}")
+    #print(f"Epoch: {i}")
 
     ## forward
     out = a.forward(x)
@@ -75,6 +90,11 @@ for i in range(EPOCHS):
     print(loss)
 
     ## First gradient
+    ## TODO
+    ## TODO
+    ## TODO simplify ( making a Model class perhaps )
+    ## TODO
+    ## TODO
     gradient = delta * c.derivitive(out)
     #print(gradient)
 
