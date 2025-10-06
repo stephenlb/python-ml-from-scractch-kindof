@@ -59,7 +59,7 @@ class Layer():
         self.weights -= LEARN_RATE * self.input.T @ self.gradient
         ## TODO 
         ## TODO 
-        ## TODO simplify
+        ## TODO simplify and validate that this is correct
         ## TODO 
         ## TODO 
         self.bias -= LEARN_RATE * np.sum(self.gradient, axis=0, keepdims=True)
