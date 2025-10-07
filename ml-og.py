@@ -21,11 +21,10 @@ class Model():
     def __init__(self, layers):
         self.layers = layers
 
-    ## Prediction
     def forward(self, inputs):
         for layer in self.layers:
-            inputs = layer.forward(inputs)
-        return inputs
+            out = layer.forward(out or inputs)
+        return out
 
     ## Backpropagation
     def backward(self, gradient):
@@ -34,22 +33,7 @@ class Model():
 
     ## Training (fit)
     def train(self, features, labels):
-        for i in range(EPOCHS):
-            ## Forward
-            out = self.forward(features)
-
-            ## Delta (error)
-            delta = out - y
-
-            ## loss for monitoring / cost
-            loss = np.mean(np.square(delta))
-            print(f"Loss: {loss}")
-
-            ## first gradient
-            gradient = delta * self.layers[-1].derivitive(out)
-
-            ## Backpropagation and Optimization
-            self.backward(gradient)
+        pass
 
 # Layer 
 class Layer():
@@ -57,7 +41,7 @@ class Layer():
         self,
         input=4,
         output=4,
-        activation=np.tan,
+        activation=np.tanh,
         derivitive=lambda x: 1 - np.tanh(x) ** 2,
     ):
         self.bias = np.random.randn(1, output)
@@ -82,7 +66,6 @@ class Layer():
     def optimize(self, gradient):
         self.weights -= LEARN_RATE * self.input.T @ gradient
         self.bias -= LEARN_RATE * np.sum(gradient, axis=0, keepdims=True)
-
 
 ## Model
 a = Layer(input=2, output=4)
@@ -118,15 +101,3 @@ for i in range(EPOCHS):
     gradient = b.backward(gradient)
     gradient = a.backward(gradient)
 
-
-### Main
-#layers = [
-#    Layer(input=2, output=4),
-#    Layer(input=4, output=4),
-#    Layer(input=4, output=1),#, activation=sigmoid, derivitive=sigmoid_derivative),
-#]
-#model = Model(layers)
-#model.train(x, y)
-#
-#print("Results:")
-#print(model.forward(x))

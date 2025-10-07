@@ -43,20 +43,22 @@ for _ in range(10000):
     
     # Gradient of loss with respect to output layer weights and biases
     d_weights_o = np.dot(hidden_layer_output.T, d_predicted_output)
-    #d_bias_o = np.sum(d_predicted_output, axis=0, keepdims=True)
+    d_bias_o = np.sum(d_predicted_output, axis=0, keepdims=True)
     
     # Gradient of loss with respect to hidden layer output
-    d_hidden_layer = np.dot(d_predicted_output, weights_o.T) * sigmoid_derivative(hidden_layer_output)
+    d_hidden_layer = np.dot(d_predicted_output, weights_o.T) * \
+        sigmoid_derivative(hidden_layer_output)
     
     # Gradient of loss with respect to hidden layer weights and biases
     d_weights_h = np.dot(X.T, d_hidden_layer)
-    #d_bias_h = np.sum(d_hidden_layer, axis=0, keepdims=True)
+    d_bias_h = np.sum(d_hidden_layer, axis=0, keepdims=True)
     
     # 5. Optimization (Gradient Descent)
     weights_o += learning_rate * d_weights_o
-    #bias_o += learning_rate * d_bias_o
+    bias_o += learning_rate * d_bias_o
+
     weights_h += learning_rate * d_weights_h
-    #bias_h += learning_rate * d_bias_h
+    bias_h += learning_rate * d_bias_h
 
 # Print final prediction and loss
 final_output = sigmoid(np.dot(sigmoid(np.dot(X, weights_h) + bias_h), weights_o) + bias_o)
