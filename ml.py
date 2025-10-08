@@ -2,7 +2,7 @@
 ## FROM SCRATCH PART 3: Updating our Framework
 import numpy as np
 
-EPOCHS=2000
+EPOCHS=3000
 LEARN_RATE=0.01
 
 ## XOR Operator
@@ -43,14 +43,10 @@ class Model():
 
             ## loss for monitoring / cost
             loss = np.mean(np.square(delta))
-            if i % 100 == 0:
-                print(f"Loss: {loss}")
-
-            ## first gradient
-            gradient = delta * self.layers[-1].derivative(out)
+            if i % 100 == 0: print(f"Loss: {loss}")
 
             ## Backpropagation and Optimization
-            self.backward(gradient)
+            self.backward(delta)
 
 # Layer 
 class Layer():
@@ -61,7 +57,7 @@ class Layer():
         activation=np.tanh,
         derivative=lambda x: 1 - x ** 2,
     ):
-        self.bias = np.random.randn(1, output)
+        self.bias = np.zeros((1, output))
         self.weights = np.random.randn(
             input,
             output,
@@ -72,12 +68,14 @@ class Layer():
     ## Forward pass (also the Predict method)
     def forward(self, inputs):
         self.input = inputs
-        return self.activation(inputs @ self.weights + self.bias)
+        self.output = self.activation(inputs @ self.weights + self.bias)
+        return self.output
 
     ## Backward Propegation (training the model)
     def backward(self, gradient):
-        self.optimize(gradient)
-        return np.dot(gradient, self.weights.T) * self.derivative(self.input) 
+        delta = gradient * self.derivative(self.output)
+        self.optimize(delta)
+        return delta @ self.weights.T
 
     ## Update model weights with gradient (adjust error)
     def optimize(self, gradient):
@@ -88,7 +86,7 @@ class Layer():
 layers = [
     Layer(input=2, output=4),
     Layer(input=4, output=4),
-    Layer(input=4, output=1,)#, activation=sigmoid, derivative=sigmoid_derivative),
+    Layer(input=4, output=1, activation=sigmoid, derivative=sigmoid_derivative),
 ]
 model = Model(layers)
 model.train(x, y)
