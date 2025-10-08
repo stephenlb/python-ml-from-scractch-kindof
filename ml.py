@@ -3,7 +3,7 @@
 import numpy as np
 
 EPOCHS=3000
-LEARN_RATE=0.01
+LEARN_RATE=0.04
 
 ## XOR Operator
 ## features (input) (training)
@@ -39,7 +39,7 @@ class Model():
             out = self.forward(features)
 
             ## Delta (error)
-            delta = out - y
+            delta = out - labels
 
             ## loss for monitoring / cost
             loss = np.mean(np.square(delta))
@@ -57,7 +57,7 @@ class Layer():
         activation=np.tanh,
         derivative=lambda x: 1 - x ** 2,
     ):
-        self.bias = np.zeros((1, output))
+        self.bias = np.random.randn(1, output) * 0.01
         self.weights = np.random.randn(
             input,
             output,
@@ -80,7 +80,7 @@ class Layer():
     ## Update model weights with gradient (adjust error)
     def optimize(self, gradient):
         self.weights -= LEARN_RATE * self.input.T @ gradient
-        self.bias -= LEARN_RATE * np.sum(gradient, axis=0, keepdims=True)
+        self.bias -= LEARN_RATE * np.mean(gradient, axis=0, keepdims=True)
 
 ### Main
 layers = [
