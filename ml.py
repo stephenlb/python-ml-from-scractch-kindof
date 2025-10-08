@@ -2,7 +2,7 @@
 ## FROM SCRATCH PART 3: Updating our Framework
 import numpy as np
 
-EPOCHS=1000
+EPOCHS=2000
 LEARN_RATE=0.01
 
 ## XOR Operator
@@ -43,10 +43,11 @@ class Model():
 
             ## loss for monitoring / cost
             loss = np.mean(np.square(delta))
-            print(f"Loss: {loss}")
+            if i % 100 == 0:
+                print(f"Loss: {loss}")
 
             ## first gradient
-            gradient = delta * self.layers[-1].derivitive(out)
+            gradient = delta * self.layers[-1].derivative(out)
 
             ## Backpropagation and Optimization
             self.backward(gradient)
@@ -57,8 +58,8 @@ class Layer():
         self,
         input=4,
         output=4,
-        activation=np.tan,
-        derivitive=lambda x: 1 - np.tanh(x) ** 2,
+        activation=np.tanh,
+        derivative=lambda x: 1 - x ** 2,
     ):
         self.bias = np.random.randn(1, output)
         self.weights = np.random.randn(
@@ -66,7 +67,7 @@ class Layer():
             output,
         )
         self.activation = activation
-        self.derivitive = derivitive
+        self.derivative = derivative
 
     ## Forward pass (also the Predict method)
     def forward(self, inputs):
@@ -76,57 +77,26 @@ class Layer():
     ## Backward Propegation (training the model)
     def backward(self, gradient):
         self.optimize(gradient)
-        return np.dot(gradient, self.weights.T) * self.derivitive(self.input) 
+        return np.dot(gradient, self.weights.T) * self.derivative(self.input) 
 
     ## Update model weights with gradient (adjust error)
     def optimize(self, gradient):
         self.weights -= LEARN_RATE * self.input.T @ gradient
         self.bias -= LEARN_RATE * np.sum(gradient, axis=0, keepdims=True)
 
-
-## Model
-a = Layer(input=2, output=4)
-b = Layer(input=4, output=4)
-c = Layer(input=4, output=1)
-
-## Training (FIT) .train() .fit()
-for i in range(EPOCHS):
-    #print(f"Epoch: {i}")
-
-    ## Forward
-    out = a.forward(x)
-    out = b.forward(out)
-    out = c.forward(out)
-
-    ## Delta (error)
-    delta = out - y
-
-    ## loss for monitoring / cost
-    loss = np.mean(np.square(delta))
-    print(loss)
-
-    ## First gradient
-    ## TODO
-    ## TODO
-    ## TODO simplify ( making a Model class perhaps )
-    ## TODO
-    ## TODO
-    gradient = delta * c.derivitive(out)
-
-    ## Backpropagation
-    gradient = c.backward(gradient)
-    gradient = b.backward(gradient)
-    gradient = a.backward(gradient)
-
-
 ### Main
-#layers = [
-#    Layer(input=2, output=4),
-#    Layer(input=4, output=4),
-#    Layer(input=4, output=1),#, activation=sigmoid, derivitive=sigmoid_derivative),
-#]
-#model = Model(layers)
-#model.train(x, y)
-#
-#print("Results:")
-#print(model.forward(x))
+layers = [
+    Layer(input=2, output=4),
+    Layer(input=4, output=4),
+    Layer(input=4, output=1,)#, activation=sigmoid, derivative=sigmoid_derivative),
+]
+model = Model(layers)
+model.train(x, y)
+
+prediction = model.forward(x)
+results = np.round(prediction)
+
+print("Results:")
+print(prediction)
+print(results)
+print([y[i][0] == r[0] for i, r in enumerate(results)])
