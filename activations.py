@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Callable, Optional
+from typing import Callable
 
 def sigmoid(x: np.ndarray) -> np.ndarray:
     """This function computes the sigmoid activation.
