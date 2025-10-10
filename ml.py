@@ -1,10 +1,7 @@
 ## TODAY WE ARE WRITING ML FRAMEWORK
-## FROM SCRATCH PART 4: Reviewing and Testing
+## FROM SCRATCH PART 5: Batching and Fixes
 import numpy as np
-np.seterr(divide='ignore')
-
-EPOCHS=1000
-LEARN_RATE=0.01
+np.seterr(divide='ignore') ## TODO FIX THIS
 
 def main():
     ## XOR Operator
@@ -18,26 +15,18 @@ def main():
     ## OR Operator
     #y = np.array([[ 0 ],[ 1 ],[ 1 ],[ 1 ]])
 
+
     import tensorflow
     from tensorflow.keras.datasets import mnist
     (X_train,y_train),(X_test,y_test)=mnist.load_data()
+
+    ## Trainging
     x = X_train.reshape(60000, 28*28).astype('float32') / 255.0
+    x_test = x[:100] #X_test.reshape(60000, 28*28).astype('float32') / 255.0
 
-    #np.eye(10)[y[0]]
-    #[ i == y[0] and 1 or 0 for i, v in enumerate([0,0,0,0,0,0,0,0,0]) ]
-    #y = np.array([ np.eye(10)[v] for v in y ])
+    ## Testing
     y = np.array([[ 1 if i == j else 0 for i in range(10)] for j in y_train])
-
-    print("x shape:")
-    print(x.shape)
-    print("y shape:")
-    print(y.shape)
-
-    ## Print first few samples
-    x = x[:100]
-    y = y[:100]
-    print(x)
-    print(y)
+    y_test = y[:100] #np.array([[ 1 if i == j else 0 for i in range(10)] for j in y_test])
 
     ### Main
     layers = [
@@ -45,17 +34,20 @@ def main():
         Layer(input=100,  output=100),
         Layer(input=100,  output=10, activation=sigmoid, derivative=sigmoid_derivative),
     ]
-    print("Initial weights:")
-    print(layers[0].weights[:3])
     model = Model(layers)
-    model.train(x, y)
+    model.train(x[:100], y[:100], batch=50, epochs=2000, learn=0.001)
 
-    prediction = model.forward(x)
+    x_test = x[:100]
+    y_test = y[:100]
+    prediction = model.forward(x_test)
     print("Results:")
     print(prediction)
+
     results = np.round(prediction)
     print(results)
-    print([y[i][0] == r[0] for i, r in enumerate(results)])
+
+    display =['✅' if y[i][0] == r[0] else '⛔️' for i, r in enumerate(results)] 
+    print(''.join(display))
 
 ## Sigmoid (0, 1)
 def sigmoid(x): return 1 / (1 + np.exp(-x))
@@ -75,20 +67,42 @@ class Model():
     ## Backpropagation
     def backward(self, gradient):
         for layer in self.layers[::-1]:
-            gradient = layer.backward(gradient)
+            gradient = layer.backward(gradient, self.learn)
 
     ## Training (fit)
-    def train(self, features, labels):
-        for i in range(EPOCHS):
+    def train(self, features, labels, batch=5, epochs=10, learn=0.001):
+        ## TODO cleanup variabls
+        ## TODO cleanup variabls
+        ## TODO cleanup variabls
+        ## TODO cleanup variabls
+        ## TODO cleanup variabls
+        ## TODO cleanup variabls
+        ## TODO cleanup variabls
+        self.learn = learn
+        ## TODO cleanup variabls
+        ## TODO cleanup variabls
+        ## TODO cleanup variabls
+        ## TODO cleanup variabls
+
+
+        ## TODO - Improve Batching0
+        ## TODO - Improve Batching0
+        ## TODO - Improve Batching0 even distribution
+        ## TODO - Improve Batching0
+        ## TODO - Improve Batching0
+        for i in range(int(epochs) * int(len(features) // batch)):
+            inputs =  np.array([features[n] for n in range(batch)])
+            targets = np.array([labels[n]   for n in range(batch)])
+
             ## Forward
-            out = self.forward(features)
+            out = self.forward(inputs)
 
             ## Delta (error)
-            delta = out - labels
+            delta = out - targets
 
             ## loss for monitoring / cost
             loss = np.mean(np.square(delta))
-            print(f"Loss: {loss}")
+            if i % 100 == 0: print(f"Loss: {loss}")
 
             ## Backpropagation and Optimization
             self.backward(delta)
@@ -117,14 +131,14 @@ class Layer():
         return self.output
 
     ## Backward Propegation (training the model)
-    def backward(self, gradient):
+    def backward(self, gradient, learn):
         delta = gradient * self.derivative(self.output)
-        self.optimize(delta)
+        self.optimize(delta, learn)
         return delta @ self.weights.T
 
     ## Update model weights with gradient (adjust error)
-    def optimize(self, gradient):
-        self.weights -= LEARN_RATE * self.input.T @ gradient
-        self.bias -= LEARN_RATE * np.mean(gradient, axis=0, keepdims=True)
+    def optimize(self, gradient, learn):
+        self.weights -= learn * self.input.T @ gradient
+        self.bias -= learn * np.mean(gradient, axis=0, keepdims=True)
 
-main()
+if __name__ == "__main__": main()
