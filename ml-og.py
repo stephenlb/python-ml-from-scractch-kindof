@@ -2,6 +2,58 @@
 ## FROM SCRATCH PART 3: Updating our Framework
 import numpy as np
 
+
+
+### ANN - Artificail Neural Network
+### DNN - Deep Neural Network
+### CNN - Convolutional  Neural Network
+### RNN - Recurrent Neural Network
+### TNNs / Transformers - ChatGPT
+
+
+## Large Language Models
+
+#INPUT: Hello! How   are  you   ?
+#        1      2     3    4    5
+#      [512]   [512][512][512][512]
+#      [0.122,
+#       0.332,
+#       ...
+#       ]
+#
+#
+#    self att Hello x Hello
+#             Hello x How
+#             Hello x are
+#
+#             |
+#             V
+#             positinoal encoding ( alternating encoding )
+#      [0.122, * 0.1
+#       0.332, * 0.5
+#       0.122, * 0.1
+#       0.332, * 0.5
+#       0.122, * 0.1
+#       0.332, * 0.5
+#       ...
+#       ]
+#
+#"Filters"
+#QKV (layers) [0.12312,0.9884]
+#Q
+#K
+#V
+#|||
+#|||
+#
+#-------------> SoftMax()-> biggest number
+#
+#
+#
+#
+#
+
+
 EPOCHS=1000
 LEARN_RATE=0.01
 
@@ -11,6 +63,10 @@ x = np.array([[0,0],[0,1],[1,0],[1,1]])
 
 ## labels (output) actual answer
 y = np.array([[0  ],[1  ],[1  ],[0  ]])
+
+
+#### Vanishion Gradient vs Exploding Gradient
+[0,0,0,0.0000000000001,0.00000001,1,1,1,1,1]
 
 ## Sigmoid 
 def sigmoid(x): return 1 / (1 + np.exp(-x))
@@ -89,11 +145,6 @@ for i in range(EPOCHS):
     print(loss)
 
     ## First gradient
-    ## TODO
-    ## TODO
-    ## TODO simplify ( making a Model class perhaps )
-    ## TODO
-    ## TODO
     gradient = delta * c.derivitive(out)
 
     ## Backpropagation
