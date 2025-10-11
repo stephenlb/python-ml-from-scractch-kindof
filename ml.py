@@ -1,5 +1,6 @@
 ## TODAY WE ARE WRITING ML FRAMEWORK
-## FROM SCRATCH PART 5: Batching and Fixes
+## FROM SCRATCH PART 6: Batching Improvements
+import activations
 import numpy as np
 np.seterr(divide='ignore') ## TODO FIX THIS
 
@@ -32,26 +33,39 @@ def main():
     layers = [
         Layer(input=784,  output=100),
         Layer(input=100,  output=100),
-        Layer(input=100,  output=10, activation=sigmoid, derivative=sigmoid_derivative),
+        Layer(input=100,  output=10, activation=activations.sigmoid, derivative=activations.sigmoid_derivative),
     ]
     model = Model(layers)
     model.train(x[:100], y[:100], batch=50, epochs=2000, learn=0.001)
 
+
+    ## Train = model learns on trainging set
+    ## Validate = test model on training set
+
     x_test = x[:100]
     y_test = y[:100]
-    prediction = model.forward(x_test)
+    predictions = model.forward(x_test)
     print("Results:")
-    print(prediction)
+    #print(predictions)
 
-    results = np.round(prediction)
-    print(results)
+    ## Max value index
+    results = []
+    for p in predictions:
+        maxp = np.argmax(p)
+        results.append([ 1 if maxp == i else 0 for i in range(len(p))])
+
+    #results = np.round(prediction)
+    print(np.array(results))
+
+    ## ASCII Blocks Descending Size Non-colored
+    ## TODO
+    ## TODO
+    ## TODO
+    ## TODO
+    blocks = ['█','▓','▒','░',' ']
 
     display =['✅' if y[i][0] == r[0] else '⛔️' for i, r in enumerate(results)] 
     print(''.join(display))
-
-## Sigmoid (0, 1)
-def sigmoid(x): return 1 / (1 + np.exp(-x))
-def sigmoid_derivative(x): return x * (1 - x)
 
 ## Model DNN (Deep Neural Network)
 class Model():
@@ -67,45 +81,44 @@ class Model():
     ## Backpropagation
     def backward(self, gradient):
         for layer in self.layers[::-1]:
-            gradient = layer.backward(gradient, self.learn)
+            gradient = layer.backward(gradient)
 
     ## Training (fit)
     def train(self, features, labels, batch=5, epochs=10, learn=0.001):
-        ## TODO cleanup variabls
-        ## TODO cleanup variabls
-        ## TODO cleanup variabls
-        ## TODO cleanup variabls
-        ## TODO cleanup variabls
-        ## TODO cleanup variabls
-        ## TODO cleanup variabls
-        self.learn = learn
-        ## TODO cleanup variabls
-        ## TODO cleanup variabls
-        ## TODO cleanup variabls
-        ## TODO cleanup variabls
+        for layer in self.layers:
+            layer.learn = learn
 
-
+        ## Randomize Batching
+        ## "Stochastic Gradient Descent"
         ## TODO - Improve Batching0
         ## TODO - Improve Batching0
         ## TODO - Improve Batching0 even distribution
         ## TODO - Improve Batching0
         ## TODO - Improve Batching0
-        for i in range(int(epochs) * int(len(features) // batch)):
-            inputs =  np.array([features[n] for n in range(batch)])
-            targets = np.array([labels[n]   for n in range(batch)])
 
-            ## Forward
-            out = self.forward(inputs)
+        for i in range(epochs):
+            stochastic = np.random.permutation(len(features))
+            inputs = features[stochastic]
+            targets = labels[stochastic]
 
-            ## Delta (error)
-            delta = out - targets
+            ####
+            for i in range(len(features) // batch):
+                input  =  inputs[i * batch : i * batch + batch]
+                target = targets[i * batch : i * batch + batch]
 
-            ## loss for monitoring / cost
-            loss = np.mean(np.square(delta))
-            if i % 100 == 0: print(f"Loss: {loss}")
+                ## Forward
+                out = self.forward(input)
 
-            ## Backpropagation and Optimization
-            self.backward(delta)
+                ## Delta (error)
+                delta = out - target
+
+                ## COST 
+                ## loss for monitoring / cost
+                loss = np.mean(np.square(delta))
+                if i % 100 == 0: print(f"Loss: {loss}")
+
+                ## Backpropagation and Optimization
+                self.backward(delta)
 
 # Layer 
 class Layer():
@@ -123,6 +136,7 @@ class Layer():
         ) * np.sqrt(1.0 / input)
         self.activation = activation
         self.derivative = derivative
+        self.learn      = 0.001
 
     ## Forward pass (also the Predict method)
     def forward(self, inputs):
@@ -131,14 +145,14 @@ class Layer():
         return self.output
 
     ## Backward Propegation (training the model)
-    def backward(self, gradient, learn):
+    def backward(self, gradient):
         delta = gradient * self.derivative(self.output)
-        self.optimize(delta, learn)
+        self.optimize(delta)
         return delta @ self.weights.T
 
     ## Update model weights with gradient (adjust error)
-    def optimize(self, gradient, learn):
-        self.weights -= learn * self.input.T @ gradient
-        self.bias -= learn * np.mean(gradient, axis=0, keepdims=True)
+    def optimize(self, gradient):
+        self.weights -= self.learn * self.input.T @ gradient
+        self.bias -= self.learn * np.mean(gradient, axis=0, keepdims=True)
 
 if __name__ == "__main__": main()
