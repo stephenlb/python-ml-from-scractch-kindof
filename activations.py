@@ -27,7 +27,8 @@ def tanh(x: np.ndarray) -> np.ndarray:
     return np.tanh(x)
 
 def tanh_derivative(x: np.ndarray) -> np.ndarray:
-    return 1 - np.tanh(x) ** 2
+    #return 1 - np.tanh(x) ** 2
+    return 1 - x ** 2
 
 def linear(x: np.ndarray) -> np.ndarray:
     """This function computes the linear activation.

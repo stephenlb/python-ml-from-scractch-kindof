@@ -1,0 +1,22 @@
+Anyway, I saw that mean squared error was used, but with binary output binary cross entropy is better, it will optimize much faster, cause mse take the square of the error. 
+
+Given that the output is between 0 and 1 (because that's the output of the sigmoid.
+
+Given that the target (the exact result of the XOR gate) is 0 or 1.
+
+The error is between 0 and 1, calculating the mse of something that is always less than 0 will result in very small loss, so even when the erorr is maximum that is 1, you'll just take the square of it that's 1, when it is smaller you would get an even smaller loss, cause let's say error=0.5 (5/10) you take the square:
+ 
+(5/10)² = 25/100 = 0.25
+
+Than you have to get the gradient of the loss, so it will be even smaller and you'll multiply it by the learning rate which is very something like 0.01 this is bad.
+
+Instead the binary cross entropy penalize with greater number cause it uses the negative natural log which increase very much when approches 0.
+
+So if you map your error to be near to 0 when the error is maximum you'll get a very great penalization.
+
+Let's take 0.7 as predicted value, but y_true is 0, so error is 0.7 bce would be:
+
+-ln(1-0.7) = -ln(0.3) =~ 1.2
+
+the formula is simple for the sigmoid:
+-ln(1-error)
